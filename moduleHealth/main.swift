@@ -25,4 +25,5 @@ let moduleName = moduleCommand!.value
 let moduleHealth = ModuleHealth(moduleName: moduleName)
 let score = moduleHealth.validate()
 
-print("Done")
+print("\(ANSIColors.yellow.rawValue)module score = \(score)")
+print("\(ANSIColors.default.rawValue)Done")
