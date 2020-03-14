@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		78061F55241C3016005B52D6 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78061F54241C3016005B52D6 /* main.swift */; };
+		78E19B2E241CC0A700DCE2A9 /* ANSIColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E19B2D241CC0A700DCE2A9 /* ANSIColors.swift */; };
+		78E19B30241CC0BA00DCE2A9 /* ArgumentsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E19B2F241CC0BA00DCE2A9 /* ArgumentsParser.swift */; };
+		78E19B32241CC2A900DCE2A9 /* ModuleHealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E19B31241CC2A900DCE2A9 /* ModuleHealth.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +28,9 @@
 /* Begin PBXFileReference section */
 		78061F51241C3016005B52D6 /* moduleHealth */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = moduleHealth; sourceTree = BUILT_PRODUCTS_DIR; };
 		78061F54241C3016005B52D6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		78E19B2D241CC0A700DCE2A9 /* ANSIColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANSIColors.swift; sourceTree = "<group>"; };
+		78E19B2F241CC0BA00DCE2A9 /* ArgumentsParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArgumentsParser.swift; sourceTree = "<group>"; };
+		78E19B31241CC2A900DCE2A9 /* ModuleHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleHealth.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,9 @@
 			isa = PBXGroup;
 			children = (
 				78061F54241C3016005B52D6 /* main.swift */,
+				78E19B31241CC2A900DCE2A9 /* ModuleHealth.swift */,
+				78E19B2F241CC0BA00DCE2A9 /* ArgumentsParser.swift */,
+				78E19B2D241CC0A700DCE2A9 /* ANSIColors.swift */,
 			);
 			path = moduleHealth;
 			sourceTree = "<group>";
@@ -120,6 +129,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78E19B30241CC0BA00DCE2A9 /* ArgumentsParser.swift in Sources */,
+				78E19B32241CC2A900DCE2A9 /* ModuleHealth.swift in Sources */,
+				78E19B2E241CC0A700DCE2A9 /* ANSIColors.swift in Sources */,
 				78061F55241C3016005B52D6 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

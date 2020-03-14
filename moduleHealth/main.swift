@@ -8,5 +8,21 @@
 
 import Foundation
 
-print("Hello, World!")
+private func printUsage() {
+    print("moduleHealth -m <MODULE-NAME>")
+    print("version 1.0.0")
+    print("")
+    print("MODULE-NAME: the name of the module")
+}
 
+let argumentsParser = ArgumentsParser(arguments: CommandLine.arguments)
+
+let commands = try argumentsParser.run()
+
+let moduleCommand = commands.first { $0.key == CommandKey.moduleName }
+let moduleName = moduleCommand!.value
+
+let moduleHealth = ModuleHealth(moduleName: moduleName)
+let score = moduleHealth.validate()
+
+print("Done")
