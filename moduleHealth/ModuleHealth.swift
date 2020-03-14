@@ -16,6 +16,21 @@ struct ModuleHealth {
         self.moduleName = moduleName
     }
 
+    func getIncomingDependencies() -> Int {
+        // todo: check if we should use Cartfile.resolved or Cartfile (number of lines should be ok)
+        let content = readFile(filePath: "\(moduleName)/Cartfile")
+
+        let carthageContent = content as NSString
+
+        var lineCount = 0
+        carthageContent.enumerateLines { (line, _) in
+            lineCount += 1
+        }
+
+        return lineCount
+
+    }
+
     func validate() -> Int {
 
         var publicProtocolList = [String]()
@@ -28,7 +43,8 @@ struct ModuleHealth {
             if element.hasSuffix("swift") {
                 print("\(ANSIColors.green.rawValue)validated - \(ANSIColors.default.rawValue)\(element)")
 
-                let result = readFile(filePath: "\(moduleName)/\(element)")
+                let content = readFile(filePath: "\(moduleName)/\(element)")
+                let result = validateAbstraction(content: content)
 
                 if result.isAbstact {
                     publicProtocolList.append(element)
@@ -45,27 +61,28 @@ struct ModuleHealth {
         return publicProtocolList.count / publicImplementationList.count
     }
 
-    private func readFile(filePath: String) -> (isAbstact: Bool, isImplementation: Bool) {
+    private func readFile(filePath: String) -> String {
         do {
-
-            let contents = try String(contentsOfFile: filePath, encoding: .utf8)
-
-            var isAbstract = false
-            var isImplementation = false
-
-            if contents.contains("public extension") {
-                isAbstract = true
-            }
-
-            if contents.contains("public struct") || contents.contains("public class") {
-                isImplementation = true
-            }
-
-            return (isAbstract, isImplementation)
+            return try String(contentsOfFile: filePath, encoding: .utf8)
         }
         catch let error as NSError {
             print("Error reading file: \(error)")
-            return (false, false)
+            return ""
         }
+    }
+
+    private func validateAbstraction(content: String) -> (isAbstact: Bool, isImplementation: Bool) {
+        var isAbstract = false
+        var isImplementation = false
+
+        if content.contains("public extension") {
+            isAbstract = true
+        }
+
+        if content.contains("public struct") || content.contains("public class") {
+            isImplementation = true
+        }
+
+        return (isAbstract, isImplementation)
     }
 }
