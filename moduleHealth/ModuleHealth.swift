@@ -16,24 +16,28 @@ struct ModuleHealth {
         self.moduleName = moduleName
     }
 
-    func getIncomingDependencies() -> Int {
+    func getIncomingDependencies() -> [String] {
         // todo: check if we should use Cartfile.resolved or Cartfile (number of lines should be ok)
         let content = readFile(filePath: "\(moduleName)/Cartfile")
 
         let carthageContent = content as NSString
 
-        var lineCount = 0
+        var dependencies = [String]()
         carthageContent.enumerateLines { (line, _) in
-            lineCount += 1
+            dependencies.append(line)
         }
 
-        return lineCount
+        return dependencies
 
     }
 
-    func validate() -> Int {
+    /// Stable abstractions principle
+    /// - a component should be as abstract as it is stable
+    /// - metric ranges from 0 to 1
+    /// - A value of 0 implies that the component has no abstract class at all. A value of 1 implies that the component contains nothing but abstract classes
+    func validateStableAbstractionsPrinciple() -> Float {
 
-        var publicProtocolList = [String]()
+        var publicAbstractionsList = [String]()
         var publicImplementationList = [String]()
 
         let enumerator = FileManager.default.enumerator(atPath: moduleName)
@@ -44,21 +48,43 @@ struct ModuleHealth {
                 print("\(ANSIColors.green.rawValue)validated - \(ANSIColors.default.rawValue)\(element)")
 
                 let content = readFile(filePath: "\(moduleName)/\(element)")
-                let result = validateAbstraction(content: content)
 
-                if result.isAbstact {
-                    publicProtocolList.append(element)
+                if containsAbstractImplementation(content: content) {
+                    publicAbstractionsList.append(element)
                 }
-                if result.isImplementation {
+                if containsConcreteImplementation(content: content) {
                     publicImplementationList.append(element)
                 }
             }
         }
 
-        print("\(ANSIColors.default.rawValue)found abstractions = \(publicProtocolList.count)")
+        print("\(ANSIColors.default.rawValue)found abstractions = \(publicAbstractionsList.count)")
         print("\(ANSIColors.default.rawValue)found implementations = \(publicImplementationList.count)")
 
-        return publicProtocolList.count / publicImplementationList.count
+        if publicImplementationList.count == 0 {
+            return 1
+        }
+        return Float(publicAbstractionsList.count) / Float(publicImplementationList.count)
+    }
+
+    private func containsAbstractImplementation(content: String) -> Bool {
+        var isAbstract = false
+
+        if content.contains("public protocol") {
+            isAbstract = true
+        }
+
+        return isAbstract
+    }
+
+    private func containsConcreteImplementation(content: String) -> Bool {
+        var isConcreteImplementation = false
+
+        if content.contains("public struct") || content.contains("public class") {
+            isConcreteImplementation = true
+        }
+
+        return isConcreteImplementation
     }
 
     private func readFile(filePath: String) -> String {
@@ -69,20 +95,5 @@ struct ModuleHealth {
             print("Error reading file: \(error)")
             return ""
         }
-    }
-
-    private func validateAbstraction(content: String) -> (isAbstact: Bool, isImplementation: Bool) {
-        var isAbstract = false
-        var isImplementation = false
-
-        if content.contains("public extension") {
-            isAbstract = true
-        }
-
-        if content.contains("public struct") || content.contains("public class") {
-            isImplementation = true
-        }
-
-        return (isAbstract, isImplementation)
     }
 }

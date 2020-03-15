@@ -23,7 +23,7 @@ let moduleCommand = commands.first { $0.key == CommandKey.moduleName }
 let moduleName = moduleCommand!.value
 
 let moduleHealth = ModuleHealth(moduleName: moduleName)
-let score = moduleHealth.validate()
+let score = moduleHealth.validateStableAbstractionsPrinciple()
 
-print("\(ANSIColors.yellow.rawValue)module score = \(score)")
+print("\(ANSIColors.yellow.rawValue)module abstraction score = \(score)")
 print("\(ANSIColors.default.rawValue)Done")
