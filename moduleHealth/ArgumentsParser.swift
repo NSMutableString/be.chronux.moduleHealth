@@ -10,11 +10,11 @@ import Foundation
 
 enum ArgumentsParserError: Error {
     case noArgumentsError
-    case moduleNotSpecifiedError
+    case moduleJsonNotSpecifiedError
 }
 
 enum CommandKey: String {
-    case moduleName = "-m"
+    case moduleJson = "-m"
 }
 
 struct ArgumentsParser {
@@ -34,8 +34,8 @@ struct ArgumentsParser {
         guard !arguments.dropFirst().isEmpty else {
             throw ArgumentsParserError.noArgumentsError
         }
-        guard arguments.contains(CommandKey.moduleName.rawValue) else {
-            throw ArgumentsParserError.moduleNotSpecifiedError
+        guard arguments.contains(CommandKey.moduleJson.rawValue) else {
+            throw ArgumentsParserError.moduleJsonNotSpecifiedError
         }
     }
 

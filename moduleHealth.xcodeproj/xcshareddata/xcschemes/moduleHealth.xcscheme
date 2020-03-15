@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-m /Users/bramhuenaerts/Documents/chronux/repos/github.com/be.chronux.ismsparkinglist"
+            argument = "-m /Users/bramhuenaerts/Documents/chronux/repos/github.com/be.chronux.moduleHealth/build/modules.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

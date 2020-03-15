@@ -20,11 +20,7 @@ struct ModuleHealth {
     /// - depend in the direction of stability
     /// - metric ranges from 0 to 1
     /// - A value of 0 indicates a maximally stable module. A value of 1 indicates a maximally unstable component
-    func validateStableDependenciesPrinciple() -> Int {
-        let allDependencies = [
-            "module_1": ["module_2", "module_3"],
-            "module_2": ["module_3"]
-        ]
+    func validateStableDependenciesPrinciple(allDependencies: [String: [String]]) -> Int {
         let incomingDependencies = getIncomingDependencies(allDependencies: allDependencies)
         let outgoingDependencies = getOutgoingDependencies().count
         if incomingDependencies + outgoingDependencies == 0 {
