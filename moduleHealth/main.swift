@@ -39,8 +39,10 @@ for module in modules {
     let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
     let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple()
     let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies)
+    let distance = moduleHealth.distanceFromMainSequence(abstractnessScore: abstractnessScore, stabilityScore: stabilityScore)
 
     print("\(ANSIColors.yellow.rawValue)module abstractness score = \(abstractnessScore)")
     print("\(ANSIColors.yellow.rawValue)module stability score = \(stabilityScore)")
+    print("\(ANSIColors.yellow.rawValue)module distance = \(distance)")
     print("\(ANSIColors.default.rawValue)Done")
 }

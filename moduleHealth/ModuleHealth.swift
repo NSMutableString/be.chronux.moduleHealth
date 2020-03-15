@@ -18,6 +18,13 @@ struct ModuleHealth {
         self.moduleName = moduleName
     }
 
+    /// Used to create a scatterplot of the modules
+    /// - a value of 0 indicates that the module is directly on the main sequence
+    /// - a value of 1 indicates that the module is as far aways as possible from the main sequence
+    func distanceFromMainSequence(abstractnessScore: Float, stabilityScore: Float) -> Float {
+        return abs(abstractnessScore + stabilityScore - 1)
+    }
+
     /// Stable dependencies principle
     /// - depend in the direction of stability
     /// - metric ranges from 0 to 1
