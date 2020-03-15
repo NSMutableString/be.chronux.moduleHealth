@@ -28,16 +28,15 @@ guard let modules = JsonHandler<[Module]>().parse(filePath: jsonModules) else {
     exit(1)
 }
 
-// Loop all over module to create a dictionary with all dependencies
-// This is needed to calculate the amount of incoming dependencies
-let allDependencies = [
-    "moduleA": ["moduleB", "moduleC"],
-    "moduleB": ["moduleC"],
-    "moduleC": []
-]
+var allDependencies = [String: [String]]()
+for module in modules {
+    let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
+    let dependencies = moduleHealth.getOutgoingDependencies()
+    allDependencies[module.name] = dependencies
+}
 
 for module in modules {
-    let moduleHealth = ModuleHealth(moduleName: module.path)
+    let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
     let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple()
     let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies)
 

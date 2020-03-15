@@ -10,9 +10,11 @@ import Foundation
 
 struct ModuleHealth {
 
+    private let modulePath: String
     private let moduleName: String
 
-    init(moduleName: String) {
+    init(modulePath: String, moduleName: String) {
+        self.modulePath = modulePath
         self.moduleName = moduleName
     }
 
@@ -20,23 +22,30 @@ struct ModuleHealth {
     /// - depend in the direction of stability
     /// - metric ranges from 0 to 1
     /// - A value of 0 indicates a maximally stable module. A value of 1 indicates a maximally unstable component
-    func validateStableDependenciesPrinciple(allDependencies: [String: [String]]) -> Int {
+    func validateStableDependenciesPrinciple(allDependencies: [String: [String]]) -> Float {
         let incomingDependencies = getIncomingDependencies(allDependencies: allDependencies)
         let outgoingDependencies = getOutgoingDependencies().count
         if incomingDependencies + outgoingDependencies == 0 {
+            print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- no dependencies")
             return 0
         }
 
         print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- incoming dependencies = \(incomingDependencies)")
         print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- outgoing dependencies = \(outgoingDependencies)")
 
-        return outgoingDependencies / ( incomingDependencies + outgoingDependencies )
+        return Float(outgoingDependencies) / ( Float(incomingDependencies) + Float(outgoingDependencies) )
     }
 
     private func getIncomingDependencies(allDependencies: [String: [String]]) -> Int {
         var incomingDependenciesCount = 0
         for dependency in allDependencies {
-            if dependency.value.contains(moduleName) {
+
+            let filteredDependencies = dependency.value.filter { (item: String) -> Bool in
+                let stringMatch = item.lowercased().range(of: moduleName.lowercased())
+                return stringMatch != nil ? true : false
+            }
+
+            if !filteredDependencies.isEmpty {
                 incomingDependenciesCount += 1
             }
         }
@@ -45,7 +54,7 @@ struct ModuleHealth {
 
     /// Get the used dependencies by parsing the `Cartfile`
     func getOutgoingDependencies() -> [String] {
-        let content = readFile(filePath: "\(moduleName)/Cartfile")
+        let content = readFile(filePath: "\(modulePath)/Cartfile")
 
         let carthageContent = content as NSString
 
@@ -68,13 +77,13 @@ struct ModuleHealth {
         var publicAbstractionsList = [String]()
         var publicImplementationList = [String]()
 
-        let enumerator = FileManager.default.enumerator(atPath: moduleName)
+        let enumerator = FileManager.default.enumerator(atPath: modulePath)
 
         while let element = enumerator?.nextObject() as? String {
             guard !element.hasPrefix("Carthage/") else { continue }
             if element.hasSuffix("swift") {
                 scannedSwiftFilesCount += 1
-                let content = readFile(filePath: "\(moduleName)/\(element)")
+                let content = readFile(filePath: "\(modulePath)/\(element)")
 
                 if containsAbstractImplementation(content: content) {
                     publicAbstractionsList.append(element)

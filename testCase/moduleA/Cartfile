@@ -1,0 +1,4 @@
+github "ModuleB"
+
+# should be skipped, empty lines as well
+github "ModuleC"
