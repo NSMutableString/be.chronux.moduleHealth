@@ -51,6 +51,7 @@ struct ModuleHealth {
 
         var dependencies = [String]()
         carthageContent.enumerateLines { (line, _) in
+            guard !line.hasPrefix("#") && !line.isEmpty else { return }
             dependencies.append(line)
         }
 
