@@ -16,8 +16,39 @@ struct ModuleHealth {
         self.moduleName = moduleName
     }
 
-    func getIncomingDependencies() -> [String] {
-        // todo: check if we should use Cartfile.resolved or Cartfile (number of lines should be ok)
+    /// Stable dependencies principle
+    /// - depend in the direction of stability
+    /// - metric ranges from 0 to 1
+    /// - A value of 0 indicates a maximally stable module. A value of 1 indicates a maximally unstable component
+    func validateStableDependenciesPrinciple() -> Int {
+        let allDependencies = [
+            "module_1": ["module_2", "module_3"],
+            "module_2": ["module_3"]
+        ]
+        let incomingDependencies = getIncomingDependencies(allDependencies: allDependencies)
+        let outgoingDependencies = getOutgoingDependencies().count
+        if incomingDependencies + outgoingDependencies == 0 {
+            return 0
+        }
+
+        print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- incoming dependencies = \(incomingDependencies)")
+        print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- outgoing dependencies = \(outgoingDependencies)")
+
+        return outgoingDependencies / ( incomingDependencies + outgoingDependencies )
+    }
+
+    private func getIncomingDependencies(allDependencies: [String: [String]]) -> Int {
+        var incomingDependenciesCount = 0
+        for dependency in allDependencies {
+            if dependency.value.contains(moduleName) {
+                incomingDependenciesCount += 1
+            }
+        }
+        return incomingDependenciesCount
+    }
+
+    /// Get the used dependencies by parsing the `Cartfile`
+    func getOutgoingDependencies() -> [String] {
         let content = readFile(filePath: "\(moduleName)/Cartfile")
 
         let carthageContent = content as NSString
@@ -28,7 +59,6 @@ struct ModuleHealth {
         }
 
         return dependencies
-
     }
 
     /// Stable abstractions principle
@@ -37,6 +67,7 @@ struct ModuleHealth {
     /// - A value of 0 implies that the component has no abstract class at all. A value of 1 implies that the component contains nothing but abstract classes
     func validateStableAbstractionsPrinciple() -> Float {
 
+        var scannedSwiftFilesCount = 0
         var publicAbstractionsList = [String]()
         var publicImplementationList = [String]()
 
@@ -45,8 +76,7 @@ struct ModuleHealth {
         while let element = enumerator?.nextObject() as? String {
             guard !element.hasPrefix("Carthage/") else { continue }
             if element.hasSuffix("swift") {
-                print("\(ANSIColors.green.rawValue)validated - \(ANSIColors.default.rawValue)\(element)")
-
+                scannedSwiftFilesCount += 1
                 let content = readFile(filePath: "\(moduleName)/\(element)")
 
                 if containsAbstractImplementation(content: content) {
@@ -58,8 +88,9 @@ struct ModuleHealth {
             }
         }
 
-        print("\(ANSIColors.default.rawValue)found abstractions = \(publicAbstractionsList.count)")
-        print("\(ANSIColors.default.rawValue)found implementations = \(publicImplementationList.count)")
+        print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- scanned swift files = \(scannedSwiftFilesCount)")
+        print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- abstractions = \(publicAbstractionsList.count)")
+        print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- implementations = \(publicImplementationList.count)")
 
         if publicImplementationList.count == 0 {
             return 1

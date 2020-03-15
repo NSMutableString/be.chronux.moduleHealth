@@ -23,7 +23,9 @@ let moduleCommand = commands.first { $0.key == CommandKey.moduleName }
 let moduleName = moduleCommand!.value
 
 let moduleHealth = ModuleHealth(moduleName: moduleName)
-let score = moduleHealth.validateStableAbstractionsPrinciple()
+let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple()
+let stabilityScore = moduleHealth.validateStableDependenciesPrinciple()
 
-print("\(ANSIColors.yellow.rawValue)module abstraction score = \(score)")
+print("\(ANSIColors.yellow.rawValue)module abstractness score = \(abstractnessScore)")
+print("\(ANSIColors.yellow.rawValue)module stability score = \(stabilityScore)")
 print("\(ANSIColors.default.rawValue)Done")
