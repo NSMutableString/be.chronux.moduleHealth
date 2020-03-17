@@ -36,15 +36,13 @@ if let csvFileName = csvCommand?.value {
 
 var allDependencies = [String: [String]]()
 for module in modules {
-    let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
+    let moduleHealth = ModuleHealth(module: module)
     let dependencies = moduleHealth.getOutgoingDependencies()
     allDependencies[module.name] = dependencies
 }
 
-let enableScatterPlot = true
-
 for module in modules {
-    let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
+    let moduleHealth = ModuleHealth(module: module)
     let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple()
     let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies)
     let distance = moduleHealth.distanceFromMainSequence(abstractnessScore: abstractnessScore, stabilityScore: stabilityScore)
@@ -58,7 +56,7 @@ for module in modules {
         print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(distance)")
     }
 
-    if enableScatterPlot {
+    if csvCommand?.value != nil {
         csvGenerator?.writeLine(moduleName: module.name, abstractnessScore: abstractnessScore, stabilityScore: stabilityScore, distance: distance)
         csvGenerator?.writeFileToCurrentFolder()
     }

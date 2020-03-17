@@ -11,6 +11,7 @@ import Foundation
 struct Module: Codable {
     let name: String
     let path: String
+    let incomingDependenciesIncrement: Int
 }
 
 struct JsonHandler<T: Decodable> {

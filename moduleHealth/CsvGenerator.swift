@@ -16,6 +16,11 @@ struct CsvGenerator {
     init(fileName: String) {
         self.fileName = fileName
         buffer = ""
+        writeHeader()
+    }
+
+    private mutating func writeHeader() {
+        buffer.append("Module name;Abstractness;Stability;Distance\n")
     }
 
     mutating func writeLine(moduleName: String, abstractnessScore: Float, stabilityScore: Float, distance: Float) {

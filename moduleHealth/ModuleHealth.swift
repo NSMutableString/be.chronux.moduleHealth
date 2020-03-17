@@ -10,12 +10,10 @@ import Foundation
 
 struct ModuleHealth {
 
-    private let modulePath: String
-    private let moduleName: String
+    private let module: Module
 
-    init(modulePath: String, moduleName: String) {
-        self.modulePath = modulePath
-        self.moduleName = moduleName
+    init(module: Module) {
+        self.module = module
     }
 
     /// Used to create a scatterplot of the modules
@@ -48,7 +46,7 @@ struct ModuleHealth {
         for dependency in allDependencies {
 
             let filteredDependencies = dependency.value.filter { (item: String) -> Bool in
-                let stringMatch = item.lowercased().range(of: moduleName.lowercased())
+                let stringMatch = item.lowercased().range(of: module.name.lowercased())
                 return stringMatch != nil ? true : false
             }
 
@@ -56,12 +54,12 @@ struct ModuleHealth {
                 incomingDependenciesCount += 1
             }
         }
-        return incomingDependenciesCount
+        return incomingDependenciesCount + module.incomingDependenciesIncrement
     }
 
     /// Get the used dependencies by parsing the `Cartfile`
     func getOutgoingDependencies() -> [String] {
-        let content = readFile(filePath: "\(modulePath)/Cartfile")
+        let content = readFile(filePath: "\(module.path)/Cartfile")
 
         let carthageContent = content as NSString
 
@@ -84,13 +82,13 @@ struct ModuleHealth {
         var publicAbstractionsList = [String]()
         var publicImplementationList = [String]()
 
-        let enumerator = FileManager.default.enumerator(atPath: modulePath)
+        let enumerator = FileManager.default.enumerator(atPath: module.path)
 
         while let element = enumerator?.nextObject() as? String {
             guard !element.hasPrefix("Carthage/") else { continue }
             if element.hasSuffix("swift") {
                 scannedSwiftFilesCount += 1
-                let content = readFile(filePath: "\(modulePath)/\(element)")
+                let content = readFile(filePath: "\(module.path)/\(element)")
 
                 if containsAbstractImplementation(content: content) {
                     publicAbstractionsList.append(element)
