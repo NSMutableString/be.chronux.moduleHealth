@@ -15,6 +15,7 @@ enum ArgumentsParserError: Error {
 
 enum CommandKey: String {
     case moduleJson = "-m"
+    case csvFileName = "-csv"
 }
 
 struct ArgumentsParser {

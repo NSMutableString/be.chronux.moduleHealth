@@ -9,14 +9,16 @@
 import Foundation
 
 private func printUsage() {
-    print("moduleHealth -m <MODULES-JSON>")
+    print("moduleHealth -m <MODULES-JSON> -csv <FILE-NAME>")
     print("version 1.0.0")
     print("")
-    print("MODULES-JSON: a JSON with a module name and the local path to it.")
+    print("-m: a JSON with a module name and the local path to it.")
+    print("-csv: create a CSV with all relevant data")
 }
 
 let argumentsParser = ArgumentsParser(arguments: CommandLine.arguments)
 let commands = try argumentsParser.run()
+var csvGenerator: CsvGenerator?
 
 let moduleCommand = commands.first { $0.key == CommandKey.moduleJson }
 guard let jsonModules = moduleCommand?.value else {
@@ -27,6 +29,10 @@ guard let modules = JsonHandler<[Module]>().parse(filePath: jsonModules) else {
     print("no module names and paths could be parsed from given configuration.")
     exit(1)
 }
+let csvCommand = commands.first { $0.key == CommandKey.csvFileName }
+if let csvFileName = csvCommand?.value {
+    csvGenerator = CsvGenerator(fileName: csvFileName)
+}
 
 var allDependencies = [String: [String]]()
 for module in modules {
@@ -35,31 +41,26 @@ for module in modules {
     allDependencies[module.name] = dependencies
 }
 
-let isLoggingEnabled = false
 let enableScatterPlot = true
 
 for module in modules {
     let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
-    let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple(isLoggingEnabled: isLoggingEnabled)
-    let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies, isLoggingEnabled: isLoggingEnabled)
+    let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple()
+    let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies)
     let distance = moduleHealth.distanceFromMainSequence(abstractnessScore: abstractnessScore, stabilityScore: stabilityScore)
 
-    if isLoggingEnabled {
-        print("\(ANSIColors.yellow.rawValue)module abstractness score = \(abstractnessScore)")
-        print("\(ANSIColors.yellow.rawValue)module stability score = \(stabilityScore)")
-        if distance > 0.5 {
-            print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(ANSIColors.red.rawValue)\(distance)")
-        }
-        else {
-            print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(distance)")
-        }
+    print("\(ANSIColors.yellow.rawValue)module abstractness score = \(abstractnessScore)")
+    print("\(ANSIColors.yellow.rawValue)module stability score = \(stabilityScore)")
+    if distance > 0.5 {
+        print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(ANSIColors.red.rawValue)\(distance)")
     }
+    else {
+        print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(distance)")
+    }
+
     if enableScatterPlot {
-        let formatter = NumberFormatter()
-        formatter.maximumFractionDigits = 2
-        let formattedAbstractnessScore = formatter.string(from: NSNumber(value: abstractnessScore))
-        let formattedStabilityScore = formatter.string(from: NSNumber(value: stabilityScore))
-        print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue);\(ANSIColors.yellow.rawValue)\(formattedStabilityScore ?? "");\(formattedAbstractnessScore ?? "")")
+        csvGenerator?.writeLine(moduleName: module.name, abstractnessScore: abstractnessScore, stabilityScore: stabilityScore, distance: distance)
+        csvGenerator?.writeFileToCurrentFolder()
     }
 }
 

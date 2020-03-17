@@ -29,7 +29,7 @@ struct ModuleHealth {
     /// - depend in the direction of stability
     /// - metric ranges from 0 to 1
     /// - A value of 0 indicates a maximally stable module. A value of 1 indicates a maximally unstable component
-    func validateStableDependenciesPrinciple(allDependencies: [String: [String]], isLoggingEnabled: Bool) -> Float {
+    func validateStableDependenciesPrinciple(allDependencies: [String: [String]]) -> Float {
         let incomingDependencies = getIncomingDependencies(allDependencies: allDependencies)
         let outgoingDependencies = getOutgoingDependencies().count
         if incomingDependencies + outgoingDependencies == 0 {
@@ -37,10 +37,8 @@ struct ModuleHealth {
             return 0
         }
 
-        if isLoggingEnabled {
-            print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- incoming dependencies = \(incomingDependencies)")
-            print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- outgoing dependencies = \(outgoingDependencies)")
-        }
+        print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- incoming dependencies = \(incomingDependencies)")
+        print("\(ANSIColors.green.rawValue)stability \(ANSIColors.default.rawValue)- outgoing dependencies = \(outgoingDependencies)")
 
         return Float(outgoingDependencies) / ( Float(incomingDependencies) + Float(outgoingDependencies) )
     }
@@ -80,7 +78,7 @@ struct ModuleHealth {
     /// - a component should be as abstract as it is stable
     /// - metric ranges from 0 to 1
     /// - A value of 0 implies that the component has no abstract class at all. A value of 1 implies that the component contains nothing but abstract classes
-    func validateStableAbstractionsPrinciple(isLoggingEnabled: Bool) -> Float {
+    func validateStableAbstractionsPrinciple() -> Float {
 
         var scannedSwiftFilesCount = 0
         var publicAbstractionsList = [String]()
@@ -103,11 +101,9 @@ struct ModuleHealth {
             }
         }
 
-        if isLoggingEnabled {
-            print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- scanned swift files = \(scannedSwiftFilesCount)")
-            print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- abstractions = \(publicAbstractionsList.count)")
-            print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- implementations = \(publicImplementationList.count)")
-        }
+        print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- scanned swift files = \(scannedSwiftFilesCount)")
+        print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- abstractions = \(publicAbstractionsList.count)")
+        print("\(ANSIColors.green.rawValue)abstractness \(ANSIColors.default.rawValue)- implementations = \(publicImplementationList.count)")
 
         if publicImplementationList.count == 0 {
             return 1
