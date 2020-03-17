@@ -35,14 +35,32 @@ for module in modules {
     allDependencies[module.name] = dependencies
 }
 
+let isLoggingEnabled = false
+let enableScatterPlot = true
+
 for module in modules {
     let moduleHealth = ModuleHealth(modulePath: module.path, moduleName: module.name)
-    let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple()
-    let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies)
+    let abstractnessScore = moduleHealth.validateStableAbstractionsPrinciple(isLoggingEnabled: isLoggingEnabled)
+    let stabilityScore = moduleHealth.validateStableDependenciesPrinciple(allDependencies: allDependencies, isLoggingEnabled: isLoggingEnabled)
     let distance = moduleHealth.distanceFromMainSequence(abstractnessScore: abstractnessScore, stabilityScore: stabilityScore)
 
-    print("\(ANSIColors.yellow.rawValue)module abstractness score = \(abstractnessScore)")
-    print("\(ANSIColors.yellow.rawValue)module stability score = \(stabilityScore)")
-    print("\(ANSIColors.yellow.rawValue)module distance = \(distance)")
-    print("\(ANSIColors.default.rawValue)Done")
+    if isLoggingEnabled {
+        print("\(ANSIColors.yellow.rawValue)module abstractness score = \(abstractnessScore)")
+        print("\(ANSIColors.yellow.rawValue)module stability score = \(stabilityScore)")
+        if distance > 0.5 {
+            print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(ANSIColors.red.rawValue)\(distance)")
+        }
+        else {
+            print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue) - \(ANSIColors.yellow.rawValue)module distance = \(distance)")
+        }
+    }
+    if enableScatterPlot {
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 2
+        let formattedAbstractnessScore = formatter.string(from: NSNumber(value: abstractnessScore))
+        let formattedStabilityScore = formatter.string(from: NSNumber(value: stabilityScore))
+        print("\(ANSIColors.magenta.rawValue)\(module.name)\(ANSIColors.default.rawValue);\(ANSIColors.yellow.rawValue)\(formattedStabilityScore ?? "");\(formattedAbstractnessScore ?? "")")
+    }
 }
+
+print("\(ANSIColors.default.rawValue)Done")
