@@ -112,7 +112,7 @@ struct ModuleHealth {
         if publicImplementationList.count == 0 {
             return 1
         }
-        return Float(publicAbstractionsList.count) / Float(publicImplementationList.count)
+        return Float(publicAbstractionsList.count) / ( Float(publicAbstractionsList.count) + Float(publicImplementationList.count) )
     }
 
     private func containsAbstractImplementation(content: String) -> Bool {
