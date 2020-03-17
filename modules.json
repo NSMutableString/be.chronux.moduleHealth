@@ -1,0 +1,16 @@
+[{
+		"name": "ModuleA",
+		"path": "/Users/bramhuenaerts/Documents/chronux/repos/github.com/be.chronux.moduleHealth/testCase/ModuleA",
+		"incomingDependenciesIncrement": 0
+	},
+	{
+		"name": "ModuleB",
+		"path": "/Users/bramhuenaerts/Documents/chronux/repos/github.com/be.chronux.moduleHealth/testCase/ModuleB",
+		"incomingDependenciesIncrement": 4
+	},
+	{
+		"name": "ModuleC",
+		"path": "/Users/bramhuenaerts/Documents/chronux/repos/github.com/be.chronux.moduleHealth/testCase/ModuleC",
+		"incomingDependenciesIncrement": 0
+	}
+]
